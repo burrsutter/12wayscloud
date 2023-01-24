@@ -1,0 +1,24 @@
+backstage:
+  extraEnvVars:
+    - name: "APP_CONFIG_app_baseUrl"
+      value: "http://{{ .Values.ingress.host }}"
+    - name: "APP_CONFIG_backend_baseUrl"
+      value: "http://{{ .Values.ingress.host }}"
+    - name: "APP_CONFIG_backend_cors_origin"
+      value: "http://{{ .Values.ingress.host }}`"
+
+ingress:
+  enabled: true
+  host: localhost
+backstage:
+  extraEnvVars:
+    - name: "APP_CONFIG_app_baseUrl"
+      value: "http://{{ .Values.ingress.host }}/backstage"
+    - name: "APP_CONFIG_backend_baseUrl"
+      value: "http://{{ .Values.ingress.host }}/backstage"
+    - name: "APP_CONFIG_backend_cors_origin"
+      value: "http://{{ .Values.ingress.host }}/backstage`"
+
+ingress:
+  enabled: true
+  host: localhost

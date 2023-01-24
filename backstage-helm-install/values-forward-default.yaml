@@ -1,0 +1,12 @@
+backstage:
+  extraEnvVars:
+    - name: 'APP_CONFIG_app_baseUrl'
+      value: 'http://{{ .Values.ingress.host }}:7007'
+    - name: 'APP_CONFIG_backend_baseUrl'
+      value: 'http://{{ .Values.ingress.host }}:7007'
+    - name: 'APP_CONFIG_backend_cors_origin'
+      value: 'http://{{ .Values.ingress.host }}:7007`'
+ 
+ingress:
+  enabled: false
+  host: localhost

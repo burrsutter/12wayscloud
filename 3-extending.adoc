@@ -1,0 +1,92 @@
+
+= Way 3: Extending Kubernetes
+
+
+=== Service Magic
+
+https://redhat-scholars.github.io/kubernetes-tutorial/kubernetes-tutorial/service-magic.html
+
+Introduce Ingress before Curl
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: my-service-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  rules:
+  - http:
+      paths:
+      - pathType: Prefix
+        path: /my-service(/|$)(.*)
+        backend:
+          service:
+            name: my-service
+            port:
+              number: 8000
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+while true
+do curl localhost:80/my-service
+sleep .3
+done
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+<head><title>503 Service Temporarily Unavailable</title></head>
+<body>
+<center><h1>503 Service Temporarily Unavailable</h1></center>
+<hr><center>nginx</center>
+----
+
+Add the correct labels
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl label pod -l app=mypython inservice=mypods
+kubectl label pod -l app=mynode inservice=mypods
+kubectl label pod -l app=mygo inservice=mypods
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Python Hello on mypython-deployment-846bb8b9bb-52s7f
+Go Hello on mygo-deployment-577bbd58fd-rzd69
+Node Bonjour on mynode-deployment-696f998c6d-6dprf 1
+Node Bonjour on mynode-deployment-696f998c6d-6dprf 2
+Python Hello on mypython-deployment-846bb8b9bb-52s7f
+Go Hello on mygo-deployment-577bbd58fd-rzd69
+Node Bonjour on mynode-deployment-696f998c6d-6dprf 3
+Go Hello on mygo-deployment-577bbd58fd-rzd69
+Go Hello on mygo-deployment-577bbd58fd-rzd69
+Python Hello on mypython-deployment-846bb8b9bb-52s7f
+----
+
+Remove the labels 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl label pod -l app=mypython inservice-
+kubectl label pod -l app=mynode inservice-
+kubectl label pod -l app=mygo inservice-
+----
+
+=== Clean Up Service Magic
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl delete namespace funstuff
+____

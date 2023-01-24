@@ -1,0 +1,4 @@
+.kube
+.minikube
+.DS_Store
+bin
