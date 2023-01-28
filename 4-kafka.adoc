@@ -1,0 +1,4 @@
+= Way 4: Kafka
+
+https://strimzi.io/quickstarts/
+

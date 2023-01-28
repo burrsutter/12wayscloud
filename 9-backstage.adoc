@@ -1,4 +1,4 @@
-= Way 2: Kubernetes as an Application Platform
+= Way 9: Kubernetes as an Application Platform
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -7,7 +7,45 @@ helm version
 version.BuildInfo{Version:"v3.11.0", GitCommit:"472c5736ab01133de504a826bd9ee12cbe4e7904", GitTreeState:"clean", GoVersion:"go1.19.5"}
 ----
 
-== Backstage:
+== Backstage on localhost
+
+Need to get an appconfig
+
+https://backstage.io/docs/getting-started/
+
+https://github.com/nvm-sh/nvm#installing-and-updating
+
+----
+nvm install 18
+nvm use 18
+----
+
+----
+node -v 
+v18.13.0
+----
+
+----
+npm -v
+8.19.3
+----
+
+----
+npx @backstage/create-app@latest
+----
+
+----
+brew install yarn
+
+cd backstage
+yarn dev
+----
+
+----
+yarn build-image
+----
+
+== Backstage into Kubernetes
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -83,25 +121,6 @@ ingress:
 EOF
 ----
 
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-cat <<'EOF' >> values-ingress-default.yaml 
-backstage:
-  extraEnvVars:
-    - name: "APP_CONFIG_app_baseUrl"
-      value: "http://{{ .Values.ingress.host }}/backstage"
-    - name: "APP_CONFIG_backend_baseUrl"
-      value: "http://{{ .Values.ingress.host }}/backstage"
-    - name: "APP_CONFIG_backend_cors_origin"
-      value: "http://{{ .Values.ingress.host }}/backstage`"
-
-ingress:
-  enabled: true
-  host: localhost
-EOF
-----
-
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -112,7 +131,7 @@ helm upgrade -n backstage backstage backstage/backstage -f values-ingress-defaul
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-open http://localhost
+open http://localhost/catalog
 ----
 
 
@@ -136,8 +155,6 @@ image::./images/backstage-6.png[]
 
 
 === Add other Components
-
-https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/components/www-artist-component.yamls
 
 https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/components/petstore-component.yaml
 

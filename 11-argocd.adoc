@@ -1,0 +1,2 @@
+= Way 11: ArgoCD
+

@@ -389,6 +389,8 @@ Clean up KinD
 kind delete cluster --name 12ways
 ----
 
+Really clean
+
 ----
 rm -rf .kube
 ----

@@ -1,0 +1,6 @@
+= Way 8: Knative Eventing
+
+
+----
+kn quickstart kind
+----

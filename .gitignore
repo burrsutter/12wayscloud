@@ -2,3 +2,11 @@
 .minikube
 .DS_Store
 bin
+kubernetes-tutorial
+kafka-tutorial
+istio-tutorial
+knative-tutorial
+node-hello
+backstage
+tekton-tutorial
+argocd-tutorial
