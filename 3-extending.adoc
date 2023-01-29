@@ -1,6 +1,10 @@
 
 = Way 3: Extending Kubernetes
 
+=== Pizza CRDs
+
+https://redhat-scholars.github.io/kubernetes-tutorial/kubernetes-tutorial/crds.html
+
 
 === Service Magic
 

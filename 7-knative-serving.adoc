@@ -449,29 +449,32 @@ v1.9.0
 ----
 
 ----
-func create -l node node-hello
+func create -l node node-hello-func
 ----
 
 ----
-# export FUNC_REGISTRY=docker.io/burrsutter/kn-functions
+export FUNC_REGISTRY=docker.io/burrsutter
 ----
 
 ----
-cd node-hello
+cd node-hello-func
 func run
 ----
 
+This runs 
+
 ----
-🙌 Function image built: docker.io/burrsutter/kn-functions/node-hello:latest
+   🙌 Function image built: docker.io/burrsutter/node-hello-func:latest
 Function already built.  Use --build to force a rebuild.
 Function started on port 8080
-{"level":30,"time":1674938922335,"pid":37,"hostname":"b7b58bce0c7e","msg":"Server listening at http://[::]:8080"}
+{"level":30,"time":1674945157347,"pid":38,"hostname":"86d45018d527","msg":"Server listening at http://[::]:8080"}
 ----
 
 
 2nd Terminal
 
 ----
+cd node-hello-func
 func invoke
 ----
 
@@ -479,6 +482,45 @@ func invoke
 Received response
 {"message":"Hello World"}%
 ----
+
+----
+func invoke --data "{\"message\":\"Hola Burr\"}"
+----
+
+----
+{"message":"Hola Burr"}
+----
+
+Modify the code of index.js
+
+----
+const handle = async (context, body) => {
+  console.log("Hola, Bonjour, Namaste");
+  // context.log.info("query", context.query);
+  // context.log.info("body", body);
+
+  // If the request is an HTTP POST, the context will contain the request body
+  if (context.method === 'POST') {
+    return { body };
+  } else if (context.method === 'GET') {
+  // If the request is an HTTP GET, the context will include a query string, if it exists
+  return {
+      query: context.query,
+    }
+  } else {
+    return { statusCode: 405, statusMessage: 'Method not allowed' };
+  }
+}
+----
+
+Cntrl-C 
+
+----
+func run
+----
+
+
+It is not yet a Knative Service
 
 ----
 kn service list
@@ -492,16 +534,63 @@ kubectl get ksvc
 func deploy
 ----
 
-To just deploy without a rebuild
+If using quay.io which defaults to private repos you might see the following message
+
+----
+Error: your function image is unreachable. It is possible that your docker registry is private. If so, make sure you have set up pull secrets https://knative.dev/docs/developer/serving/deploying-from-private-registry
+----
+
+image::./images/quay-io.png[]
+
+----
+kubectl get ksvc
+----
+
+----
+NAME              URL                                                 LATESTCREATED           LATESTREADY             READY   REASON
+node-hello-func   http://node-hello-func.default.127.0.0.1.sslip.io   node-hello-func-00001   node-hello-func-00001   True
+----
+
+
+----
+curl $(kn service describe node-hello-func -o url)
+----
+
+----
+{"query":{}}
+----
+
+----
+curl -H 'Content-Type: application/json' \
+     -d '{ "my":"stuff","happens":"here", "id": 1}' \
+     -X POST \
+     $(kn service describe node-hello-func -o url)
+----
+
+----
+{"my":"stuff","happens":"here","id":1}
+----
+
+To just deploy without a build
 
 ----
 func deploy --build false
 ----
 
-If you have Tekton and Knative
+To clean out that Function
 
 ----
-func deploy --remote
+func delete 
+----
+
+----
+kubectl get ksvc
+No resources found in default namespace.
+----
+
+----
+kn service list
+No services found.
 ----
 
 == Clean Up
