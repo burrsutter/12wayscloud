@@ -115,6 +115,18 @@ kn service delete eventinghello
 
 Follow the steps in 4-kafka.adoc to configure a Kafka inside your KinD cluster
 
+More information at 
+
+https://knative.dev/docs/eventing/sources/kafka-source/#optional-create-a-kafka-topic
+
+and 
+
+https://github.com/burrsutter/knative-kafka
+
+https://redhat-developer-demos.github.io/knative-tutorial/knative-tutorial/advanced/eventing-with-kafka.html
+
+
+
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----

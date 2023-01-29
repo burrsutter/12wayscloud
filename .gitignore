@@ -2,6 +2,7 @@
 .minikube
 .DS_Store
 bin
+istio-1.16.1
 kubernetes-tutorial
 kafka-tutorial
 istio-tutorial
@@ -10,3 +11,4 @@ backstage
 tekton-tutorial
 argocd-tutorial
 node-hello-func
+blue-green-canary
