@@ -131,6 +131,11 @@ Max Cores
 [source,bash,subs="+macros,+attributes"]
 ----
 kubectl get node 12ways-control-plane -ojsonpath='{.status.capacity.cpu}'
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
 4
 ----
 
@@ -201,33 +206,6 @@ kube-system          kube-controller-manager-12ways-control-plane   1/1     Runn
 kube-system          kube-proxy-gphrh                               1/1     Running   0          9m41s
 kube-system          kube-scheduler-12ways-control-plane            1/1     Running   0          9m56s
 local-path-storage   local-path-provisioner-684f458cdd-86drl        1/1     Running   0          9m41s
-----
-
-=== Ingress MetalLB Installation
-
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-----
-
-Wait for it
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-kubectl wait --namespace metallb-system \
-                --for=condition=ready pod \
-                --selector=app=metallb \
-                --timeout=90s
-----
-
-----
-docker network inspect -f '{{.IPAM.Config}}' kind
-[{172.19.0.0/16  172.19.0.1 map[]} {fc00:f853:ccd:e793::/64  fc00:f853:ccd:e793::1 map[]}]
-----
-
-----
-kubectl apply -f https://kind.sigs.k8s.io/examples/loadbalancer/metallb-config.yaml
 ----
 
 === Ingress Nginx Installation
