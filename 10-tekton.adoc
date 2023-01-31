@@ -297,14 +297,6 @@ NAME                 READY   STATUS      RESTARTS   AGE
 hello-task-run-pod   0/1     Completed   0          7s
 ----
 
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-stern hello-task
-+ hello-task-run-pod › step-echo
-hello-task-run-pod step-echo Hello World
-- hello-task-run-pod › step-echo
-----
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]s
