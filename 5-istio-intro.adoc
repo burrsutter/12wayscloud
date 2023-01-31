@@ -15,9 +15,14 @@ gcloud container clusters create frankfurt --zone europe-west3-a --num-nodes 4
 
 ----
 kubectl get nodes
-NAME                                       STATUS   ROLES    AGE     VERSION
-gke-frankfurt-default-pool-bb9cde32-p0qx   Ready    <none>   7m43s   v1.24.8-gke.2000
-gke-frankfurt-default-pool-bb9cde32-p893   Ready    <none>   7m43s   v1.24.8-gke.2000
+----
+
+----
+NAME                                       STATUS   ROLES    AGE   VERSION
+gke-frankfurt-default-pool-f6e5f40a-2k7k   Ready    <none>   10m   v1.24.8-gke.2000
+gke-frankfurt-default-pool-f6e5f40a-42bw   Ready    <none>   10m   v1.24.8-gke.2000
+gke-frankfurt-default-pool-f6e5f40a-fhw8   Ready    <none>   10m   v1.24.8-gke.2000
+gke-frankfurt-default-pool-f6e5f40a-rkz4   Ready    <none>   10m   v1.24.8-gke.2000
 ----
 
 [.console-input]
@@ -88,6 +93,10 @@ kubectl label namespace tutorial istio-injection=enabled
 [source,bash,subs="+macros,+attributes"]
 ----
 git clone https://github.com/redhat-scholars/istio-tutorial
+----
+
+----
+watch kubectl get pods
 ----
 
 [.console-input]

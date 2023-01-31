@@ -15,6 +15,10 @@ https://backstage.io/docs/getting-started/
 
 https://github.com/nvm-sh/nvm#installing-and-updating
 
+
+https://demo.backstage.io/
+
+
 ----
 nvm install 18
 nvm use 18
@@ -38,12 +42,30 @@ npx @backstage/create-app@latest
 brew install yarn
 
 cd backstage
-yarn dev
+
+yarn add --cwd packages/backend pg
 ----
 
 ----
-yarn build-image
+yarn dev
 ----
+
+== Docker
+
+https://backstage.io/docs/deployment/docker
+
+----
+yarn build:backend
+----
+
+----
+docker image build . -f packages/backend/Dockerfile --tag backstage
+----
+
+----
+docker run -it -p 7007:7007 backstage
+----
+
 
 == Backstage into Kubernetes
 
