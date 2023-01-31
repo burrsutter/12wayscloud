@@ -299,7 +299,7 @@ hello-task-run-pod   0/1     Completed   0          7s
 
 
 [.console-input]
-[source,bash,subs="+macros,+attributes"]s
+[source,bash,subs="+macros,+attributes"]
 ----
 tkn task logs hello
 ----
