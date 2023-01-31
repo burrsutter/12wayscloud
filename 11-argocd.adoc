@@ -1,2 +1,6 @@
 = Way 11: ArgoCD
 
+https://github.com/argoproj/argo-cd/issues/9422
+
+https://github.com/burrsutter/doks-argocd
+

@@ -1,0 +1,19 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: hello-pipeline-template
+spec:
+  params:
+  - name: myname
+    default: "Burr"
+  resourcetemplates:
+  - apiVersion: tekton.dev/v1beta1
+    kind: PipelineRun
+    metadata:
+      generateName: hello-pipeline-run-
+    spec:
+      pipelineRef:
+        name: hello-pipeline
+      params:
+      - name: myname
+        value: $(tt.params.myname)

@@ -3,6 +3,9 @@
 https://github.com/tektoncd/dashboard/blob/main/docs/walkthrough/walkthrough-kind.md
 
 
+https://tekton.dev/docs/getting-started/
+
+
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
@@ -215,7 +218,7 @@ kubectl create namespace tektontutorial
 kubectl config set-context --current --namespace=tektontutorial
 ----
 
-Tasks
+== Tasks
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -228,7 +231,7 @@ No Tasks found
 ----
 
 
-Hello 
+*Hello*
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -322,44 +325,291 @@ kubectl delete taskrun hello-task-run
 And the Completed Pod goes away
 
 ----
-kubectl logs --selector=tekton.dev/taskRun=hello-task-run
+kubectl logs --selector=tekton.dev/taskRun=hello-task-run   
+----
+
+
+== Self-Describing Task Runs
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: goodbye-task-run
+spec:
+  taskSpec:
+    steps:
+      - name: echo
+        image: alpine
+        script: |
+          #!/bin/sh
+          echo "Goodbye World"
+EOF
 ----
 
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-git clone https://github.com/redhat-scholars/tekton-tutorial
-----
-
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-kubectl apply -n tektontutorial -f tekton-stuff/source-lister.yaml
+tkn taskrun logs goodbye-task-run
 ----
 
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-tkn task ls
-----
-
-----
-NAME            DESCRIPTION   AGE
-source-lister                 16 seconds ago
+[echo] Goodbye World
 ----
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-tkn task describe source-lister
+tkn taskrun delete goodbye-task-run
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+tkn task delete hello
+----
+
+
+
+== Pipelines
+
+Create a few tasks to pull together into a Pipeline
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: one
+spec:
+  steps:
+    - name: echo
+      image: alpine
+      script: |
+        #!/bin/sh
+        echo "One - 1"
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: two
+spec:
+  steps:
+    - name: echo
+      image: alpine
+      script: |
+        #!/bin/sh
+        echo "Two - 2"
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: three
+spec:
+  steps:
+    - name: echo
+      image: alpine
+      script: |
+        #!/bin/sh
+        echo "Three - 3"
+EOF
+----
+
+Create a Pipeline to organize these Tasks
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: one-two-three
+spec:
+  tasks:
+    - name: one
+      taskRef:
+        name: one
+    - name: two
+      runAfter:
+        - one
+      taskRef:
+        name: two
+    - name: three
+      runAfter:
+        - two
+      taskRef:
+        name: three
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+tkn pipeline ls
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+NAME            AGE            LAST RUN   STARTED   DURATION   STATUS
+one-two-three   1 minute ago   ---        ---       ---        ---
+----
+
+*Watch for pods*
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+watch kubectl get pods
+----
+
+*Stream some logs*
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+stern one-two-three
+----
+
+*Create the PipelineRun*
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: one-two-three-run
+spec:
+  pipelineRef:
+    name: one-two-three
+EOF
+----
+
+image::./images/one-two-three-run.png[]
 
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-tkn task start source-lister --showlog
+tkn pipelines ls
+----
+
+----
+NAME            AGE              LAST RUN            STARTED         DURATION   STATUS
+one-two-three   10 minutes ago   one-two-three-run   4 minutes ago   14s        Succeeded
+----
+
+
+== Params
+
+Task with Param
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/hello-w-params.yml
+----
+
+----
+stern hello
+----
+
+Pipeline 
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/hello-pipeline.yml
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/hello-pipeline-run.yml
+----
+
+
+== Triggers
+
+https://tekton.dev/docs/getting-started/triggers/
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+watch kubectl get pods -n tekton-pipelines
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/triggers/latest/release.yaml
+kubectl apply --filename \
+https://storage.googleapis.com/tekton-releases/triggers/latest/interceptors.yaml
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+watch kubectl get pods -n tekton-pipelines
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+NAME                                                 READY   STATUS    RESTARTS   AGE
+tekton-dashboard-664cb4fd64-r77kb                    1/1     Running   0          24h
+tekton-pipelines-controller-6754f4c756-ldjn6         1/1     Running   0          25h
+tekton-pipelines-webhook-649f49588-v282s             1/1     Running   0          25h
+tekton-triggers-controller-5549f95578-6zbp9          1/1     Running   0          2m
+tekton-triggers-core-interceptors-6f7c8c8495-7zc9b   1/1     Running   0          2m
+tekton-triggers-webhook-7c89d86bb4-f8xhh             1/1     Running   0          2m
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/hello-trigger-template.yml
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/hello-trigger-binding.yml
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/trigger-rbac.yml
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl apply -f tekton-stuff/hello-trigger-eventlistener.yml
 ----
 
