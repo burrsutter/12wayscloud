@@ -5,12 +5,6 @@
 https://redhat-scholars.github.io/kubernetes-tutorial/kubernetes-tutorial/crds.html
 
 
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-kubectl create namespace pizzahat
-kubectl config set-context --current --namespace=pizzahat
-----
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -21,6 +15,14 @@ kubectl api-resources | grep pizza
 ----
 kubectl get crds
 ----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl create namespace pizzahat
+kubectl config set-context --current --namespace=pizzahat
+----
+
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -115,6 +117,111 @@ EOF
 === Service Magic
 
 https://redhat-scholars.github.io/kubernetes-tutorial/kubernetes-tutorial/service-magic.html
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl create namespace funstuff
+kubectl config set-context --current --namespace=funstuff
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mypython-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mypython
+  template:
+    metadata:
+      labels:
+        app: mypython
+    spec:
+      containers:
+      - name: mypython
+        image: quay.io/rhdevelopers/mypython:v1
+        ports:
+        - containerPort: 8000
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mygo-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mygo
+  template:
+    metadata:
+      labels:
+        app: mygo
+    spec:
+      containers:
+      - name: mygo
+        image: quay.io/rhdevelopers/mygo:v1
+        ports:
+        - containerPort: 8000
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mynode-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mynode
+  template:
+    metadata:
+      labels:
+        app: mynode
+    spec:
+      containers:
+      - name: mynode
+        image: quay.io/rhdevelopers/mynode:v1
+        ports:
+        - containerPort: 8000
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-service
+  labels:
+    app: mystuff
+spec:
+  ports:
+  - name: http
+    port: 8000
+  selector:
+    inservice: mypods
+  type: LoadBalancer
+EOF
+----
 
 Introduce Ingress before Curl
 

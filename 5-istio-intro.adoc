@@ -275,7 +275,7 @@ Injure Recommendation v2
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl exec -it -n tutorial $(kubectl get pods -n tutorial|grep recommendation-v2|awk '{ print $1 }'|head -1) -c recommendation /bin/bash
+kubectl exec -it -n tutorial $(kubectl get pods -n tutorial|grep recommendation-v2|awk '{ print $1 }'|head -1) -c recommendation -- /bin/bash
 ----
 
 [.console-input]
@@ -293,81 +293,3 @@ customer => preference => recommendation v1 from 'recommendation-v1-64f475959-jj
 
 
 image::./images/kiali-dashboard-error.png[]
-
-== Blue/Green/Canary
-
-https://github.com/redhat-developer-demos/blue-green-canary
-
-----
-git clone https://github.com/redhat-developer-demos/blue-green-canary
-----
-
-----
-kubectl create namespace one
-kubectl config set-context --current --namespace=one
-kubectl label namespace one istio-injection=enabled
-----
-
-----
-kubectl apply -f blue-green-canary/src/main/kubernetes/Deployment_blue.yml -n one
-kubectl apply -f blue-green-canary/src/main/kubernetes/Deployment_green.yml -n one
-kubectl apply -f blue-green-canary/src/main/kubernetes/Deployment_canary.yml -n one
-kubectl create -f blue-green-canary/src/main/kubernetes/Service.yml -n one
-----
-
-----
-kubectl apply -f bgc-gateway.yml -n one
-kubectl apply -f bgc-virtualservice-default.yml -n one
-kubectl apply -f bgc-destination-rule.yml
-----
-
-----
-GATEWAY_IP=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath="{.status.loadBalancer.ingress[0].ip}")
-echo $GATEWAY_IP
-open http://$GATEWAY_IP/bgc
-----
-
-----
-while true
-do curl $GATEWAY_IP/api
-sleep .3
-echo ""
-done
-----
-
-----
-kubectl replace -f bgc-virtual-service-green.yml
-----
-
-----
-{"msgCount" :519, "hello" : "Hola", "pod" : "green-84678ccbcb-bzkwn", "useragent" : "curl/7.85.0", "color" : "#5bbf45"}
-{"msgCount" :519, "hello" : "Hola", "pod" : "green-84678ccbcb-hxbd2", "useragent" : "curl/7.85.0", "color" : "#5bbf45"}
-{"msgCount" :519, "hello" : "Hola", "pod" : "green-84678ccbcb-bzkwn", "useragent" : "curl/7.85.0", "color" : "#5bbf45"}
-{"msgCount" :520, "hello" : "Hola", "pod" : "green-84678ccbcb-bzkwn", "useragent" : "curl/7.85.0", "color" : "#5bbf45"}
-----
-
-image::./images/bgc-green.png[]
-
-
-----
-kubectl replace -f bgc-virtual-service-blue.yml
-----
-
-----
-kubectl replace -f bgc-virtual-service-canary.yml
-----
-
-----
-kubectl replace -f bgc-virtual-service-default.yml
-----
-
-
-== Clean
-
-Wipe the GKE cluster
-
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-gcloud container clusters delete frankfurt --zone europe-west3-a
-----

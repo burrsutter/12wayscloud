@@ -78,3 +78,8 @@ strimzi-store-topic---effb8e3e057afce1ecf67c3f5d8e4e3ff177fc55                  
 strimzi-topic-operator-kstreams-topic-store-changelog---b75e702040b99be8a9263134de3507fc0cc4017b   my-cluster   1            1
 ----
 
+Clean up KinD
+----
+kind delete cluster --name 12ways
+----
+
