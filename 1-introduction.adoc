@@ -39,6 +39,13 @@ version.BuildInfo{Version:"v3.11.0", GitCommit:"472c5736ab01133de504a826bd9ee12c
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
+kind get clusters
+----
+
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
 mkdir 12wayscloud
 cd 12wayscloud
 ----
