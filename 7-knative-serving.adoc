@@ -44,10 +44,6 @@ export KUBECONFIG=$KIND_HOME/.kube/config
 export KUBE_EDITOR="code -w"
 ----
 
-----
-kubectl get nodes
-----
-
 This next command starts a KinD cluster specifically for Knative usage
 
 ----
@@ -61,7 +57,7 @@ kind get clusters
 ----
 
 ----
-knative
+kubectl get nodes
 ----
 
 ----
@@ -419,22 +415,18 @@ blue-green-canary-00002   blue-green-canary   45%              2            11m 
 blue-green-canary-00001   blue-green-canary   45%              1            18m    4 OK / 4     True
 ----
 
-== Functions - fn
+Clean
+----
+ kn service delete blue-green-canary
+----
+
+== Functions - func
 
 https://knative.dev/docs/functions/
 
 
 https://cloud-native.slack.com/archives/C04LKEZUXEE
 
-
-----
-kind delete cluster --name=knative
-----
-
-
-----
-kn quickstart kind
-----
 
 Install `func`
 
@@ -459,6 +451,14 @@ export FUNC_REGISTRY=docker.io/burrsutter
 ----
 cd node-hello-func
 func run
+----
+
+----
+docker ps
+----
+
+----
+docker images
 ----
 
 This runs 
@@ -530,6 +530,13 @@ kn service list
 kubectl get ksvc
 ----
 
+Cntrl-C 
+
+
+----
+docker login
+----
+
 ----
 func deploy
 ----
@@ -558,6 +565,10 @@ curl $(kn service describe node-hello-func -o url)
 
 ----
 {"query":{}}
+----
+
+----
+stern node-hello
 ----
 
 ----
@@ -597,6 +608,10 @@ No services found.
 
 ----
 kind delete cluster --name knative
+----
+
+----
+rm -rf node-hello-func
 ----
 
 ----
