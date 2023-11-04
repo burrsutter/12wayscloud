@@ -1,13 +1,13 @@
 = Way 1: Introduction (Getting Started)
 
-Using KinD which requires Docker
+Using KinD which requires Docker, perhaps Podman Desktop
 
 https://kind.sigs.k8s.io/docs/user/quick-start/
 
 https://www.docker.com/products/docker-desktop/
 
 
-I use Homebrew on MacOS
+I use Homebrew on MacOS for installation of CLIs for Kubernetes exploration
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -26,14 +26,35 @@ brew install stern
 [source,bash,subs="+macros,+attributes"]
 ----
 kind --version
-kind version 0.17.0
+kind v0.20.0 go1.21.1 darwin/arm64
 
 kubectl version --short
 Client Version: v1.26.1
 Kustomize Version: v4.5.7
 
 helm version
-version.BuildInfo{Version:"v3.11.0", GitCommit:"472c5736ab01133de504a826bd9ee12cbe4e7904", GitTreeState:"clean", GoVersion:"go1.19.5"}
+version.BuildInfo{Version:"v3.13.1", GitCommit:"3547a4b5bf5edb5478ce352e18858d8a552a4110", GitTreeState:"clean", GoVersion:"go1.21.3"}
+----
+
+I have historically used `kind` with Docker Desktop but Podman Desktop is now a possibility 
+
+https://podman-desktop.io/
+
+image::./images/podman-desktop-1.png[]
+
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+docker ps
+----
+
+If you get the following it means your docker daemon is not reachable, likely not running
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Cannot connect to the Docker daemon at unix:///Users/burr/.docker/run/docker.sock. Is the docker daemon running?
 ----
 
 [.console-input]
@@ -42,6 +63,14 @@ version.BuildInfo{Version:"v3.11.0", GitCommit:"472c5736ab01133de504a826bd9ee12c
 kind get clusters
 ----
 
+kind will also struggle if it can not find the docker daemon
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+ERROR: failed to list clusters: command "docker ps -a --filter label=io.x-k8s.kind.cluster --format '{{.Label "io.x-k8s.kind.cluster"}}'" failed with error: exit status 1
+Command Output: Cannot connect to the Docker daemon at unix:///Users/burr/.docker/run/docker.sock. Is the docker daemon running?
+----
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -103,8 +132,8 @@ kind get clusters
 [source,bash,subs="+macros,+attributes"]
 ----
 docker ps
-CONTAINER ID   IMAGE                  COMMAND                  CREATED          STATUS          PORTS                       NAMES
-2c849d23b935   kindest/node:v1.25.3   "/usr/local/bin/entr…"   14 minutes ago   Up 14 minutes   127.0.0.1:54904->6443/tcp   12ways-control-plane
+CONTAINER ID   IMAGE                  COMMAND                  CREATED         STATUS         PORTS                                                                 NAMES
+bce2718ab1f8   kindest/node:v1.27.3   "/usr/local/bin/entr…"   6 minutes ago   Up 6 minutes   0.0.0.0:80->80/tcp, 0.0.0.0:443->443/tcp, 127.0.0.1:64407->6443/tcp   12ways-control-plane
 ----
 
 [.console-input]
@@ -273,7 +302,7 @@ In another window, create a Namespace and a Deployment
 kubectl create namespace mystuff
 kubectl config set-context --current --namespace=mystuff
 
-kubectl create deployment myapp --image=quay.io/rhdevelopers/quarkus-demo:v1
+kubectl create deployment myapp --image=docker.io/burrsutter/quarkus-demo:v1
 ----
 
 watch kubectl get events output
@@ -307,6 +336,20 @@ NAME    TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
 myapp   LoadBalancer   10.96.93.230   <pending>     8080:30099/TCP   4s
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl scale deployment myapp --replicas=2
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+NAME                     READY   STATUS    RESTARTS   AGE
+myapp-7c4d88cb56-8kc2f   1/1     Running   0          4s
+myapp-7c4d88cb56-rvjv5   1/1     Running   0          84s
+----
+
 Ingress 
 
 [.console-input]
@@ -333,14 +376,13 @@ spec:
 EOF
 ----
 
-OR Forward but you lose load-balancing!
+OR port forward but you might lose the load-balancing aspect
 
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
+
 kubectl port-forward service/myapp 8080:8080
-----
 
+
+Ingress is better, so stick with Ingress
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -376,23 +418,211 @@ myapp-85cf5bbddb-ts6fb   1/1     Running   0          18m
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-ts6fb:32
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-n8tdk:2
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-n8tdk:3
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-ts6fb:33
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-n8tdk:4
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-ts6fb:34
+Aloha from Supersonic Subatomic Quarkus! 1
+Aloha from Supersonic Subatomic Quarkus! 2
+Aloha from Supersonic Subatomic Quarkus! 3
 ----
+
+=== Rolling update
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl set image deployment/myapp quarkus-demo=docker.io/burrsutter/boot-demo:v1
+----
+
+You might see errors
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+<body>
+<center><h1>502 Bad Gateway</h1></center>
+<hr><center>nginx</center>
+</body>
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Jambo from Spring Boot! 1
+Jambo from Spring Boot! 2
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl set image deployment/myapp quarkus-demo=docker.io/burrsutter/boot-demo:v2
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Bonjour from Spring Boot! 8 on myapp-66544cc7d5-hxtbz
+Bonjour from Spring Boot! 7 on myapp-66544cc7d5-9g4mc
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl set image deployment/myapp quarkus-demo=quay.io/rhdevelopers/quarkus-demo:v1
+----
+
+Quarkus is so fast you might not see any errors
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Supersonic Subatomic Java with Quarkus myapp-644bb85454-ndq7v:7
+Supersonic Subatomic Java with Quarkus myapp-644bb85454-cjpwh:1
+----
+
+=== Live & Ready
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl delete deployment myapp
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kubectl apply -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: myapp
+  template:
+    metadata:
+      labels:
+        app: myapp
+        env: dev
+    spec:
+      containers:
+      - name: myapp
+        image: docker.io/burrsutter/boot-demo:v1
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            memory: "300Mi"
+            cpu: "250m" # 1/4 core
+          limits:
+            memory: "400Mi"
+            cpu: "1000m" # 1 core
+        livenessProbe:
+          httpGet:
+              path: /alive
+              port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 3
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl get endpoints
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+NAME    ENDPOINTS                           AGE
+myapp   10.244.0.35:8080,10.244.0.36:8080   5h28m
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl get endpoints myapp -o json | jq '.subsets[].addresses[].ip'
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+"10.244.0.35"
+"10.244.0.36"
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Jambo from Spring Boot! 2
+Jambo from Spring Boot! 3
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl set image deployment/myapp myapp=docker.io/burrsutter/boot-demo:v2
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Bonjour from Spring Boot! 3
+Bonjour from Spring Boot! 4
+Bonjour from Spring Boot! 1
+Bonjour from Spring Boot! 5
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl set image deployment/myapp myapp=docker.io/burrsutter/quarkus-demo:v1
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Aloha from Supersonic Subatomic Quarkus! 2
+Aloha from Supersonic Subatomic Quarkus! 3
+Aloha from Supersonic Subatomic Quarkus! 4
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl set image deployment/myapp myapp=docker.io/burrsutter/boot-demo:v1
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+Bonjour from Spring Boot! 3
+Bonjour from Spring Boot! 4
+Bonjour from Spring Boot! 1
+Bonjour from Spring Boot! 5
+----
+
 
 === Clean MyStuff
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl delete namespace mystuff
+kubectl delete deployment myapp
 ----
 
-
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl delete namespace mystuff
+----
 
 
 === Overall Tutorial Clean Up

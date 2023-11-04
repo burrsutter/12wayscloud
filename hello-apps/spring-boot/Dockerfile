@@ -1,0 +1,6 @@
+FROM openjdk:17
+ENV JAVA_APP_JAR hello-1.0.0.jar
+WORKDIR /app/
+COPY target/$JAVA_APP_JAR .
+EXPOSE 8080
+CMD java $JAVA_OPTIONS -jar $JAVA_APP_JAR
