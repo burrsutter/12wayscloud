@@ -19,7 +19,7 @@ public class GreetingResource {
     @GET
     @Produces(MediaType.TEXT_PLAIN)
     public String root() {
-      greeting = "Aloha";
+      greeting = "Hola";
       count++;
       System.out.println(greeting + ": " + count);
       return greeting + " from Supersonic Subatomic Quarkus! " + count + "\n";

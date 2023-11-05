@@ -29,8 +29,8 @@ kind --version
 kind v0.20.0 go1.21.1 darwin/arm64
 
 kubectl version --short
-Client Version: v1.26.1
-Kustomize Version: v4.5.7
+Client Version: v1.28.3
+Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
 
 helm version
 version.BuildInfo{Version:"v3.13.1", GitCommit:"3547a4b5bf5edb5478ce352e18858d8a552a4110", GitTreeState:"clean", GoVersion:"go1.21.3"}
@@ -87,6 +87,8 @@ export PATH=$KIND_HOME/bin:$PATH
 export KUBECONFIG=$KIND_HOME/.kube/config
 export KUBE_EDITOR="code -w"
 ----
+
+Create KinD Cluster
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -336,11 +338,6 @@ NAME    TYPE           CLUSTER-IP     EXTERNAL-IP   PORT(S)          AGE
 myapp   LoadBalancer   10.96.93.230   <pending>     8080:30099/TCP   4s
 ----
 
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
-----
-kubectl scale deployment myapp --replicas=2
-----
 
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
@@ -376,6 +373,12 @@ spec:
 EOF
 ----
 
+
+ImplementationSpecific
+
+https://github.com/kubernetes/ingress-nginx/issues/10200
+
+
 OR port forward but you might lose the load-balancing aspect
 
 
@@ -388,7 +391,7 @@ Ingress is better, so stick with Ingress
 [source,bash,subs="+macros,+attributes"]
 ----
 curl localhost:80/myapp
-Supersonic Subatomic Java with Quarkus myapp-85cf5bbddb-j8z4t:1
+Aloha from Supersonic Subatomic Quarkus! 1
 ----
 
 [.console-input]
@@ -420,7 +423,9 @@ myapp-85cf5bbddb-ts6fb   1/1     Running   0          18m
 ----
 Aloha from Supersonic Subatomic Quarkus! 1
 Aloha from Supersonic Subatomic Quarkus! 2
+Aloha from Supersonic Subatomic Quarkus! 2
 Aloha from Supersonic Subatomic Quarkus! 3
+Aloha from Supersonic Subatomic Quarkus! 4
 ----
 
 === Rolling update
@@ -465,16 +470,17 @@ Bonjour from Spring Boot! 7 on myapp-66544cc7d5-9g4mc
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl set image deployment/myapp quarkus-demo=quay.io/rhdevelopers/quarkus-demo:v1
+kubectl set image deployment/myapp quarkus-demo=docker.io/burrsutter/quarkus-demo:v1
 ----
 
-Quarkus is so fast you might not see any errors
 
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-Supersonic Subatomic Java with Quarkus myapp-644bb85454-ndq7v:7
-Supersonic Subatomic Java with Quarkus myapp-644bb85454-cjpwh:1
+Aloha from Supersonic Subatomic Quarkus! 1
+Bonjour from Spring Boot! 86
+Aloha from Supersonic Subatomic Quarkus! 2
+Aloha from Supersonic Subatomic Quarkus! 1
 ----
 
 === Live & Ready
@@ -561,8 +567,10 @@ kubectl get endpoints myapp -o json | jq '.subsets[].addresses[].ip'
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
+Jambo from Spring Boot! 1
+Jambo from Spring Boot! 1
 Jambo from Spring Boot! 2
-Jambo from Spring Boot! 3
+Jambo from Spring Boot! 2
 ----
 
 [.console-input]
@@ -574,10 +582,11 @@ kubectl set image deployment/myapp myapp=docker.io/burrsutter/boot-demo:v2
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-Bonjour from Spring Boot! 3
-Bonjour from Spring Boot! 4
 Bonjour from Spring Boot! 1
-Bonjour from Spring Boot! 5
+Jambo from Spring Boot! 46
+Bonjour from Spring Boot! 2
+Bonjour from Spring Boot! 3
+Bonjour from Spring Boot! 1
 ----
 
 [.console-input]
@@ -589,9 +598,11 @@ kubectl set image deployment/myapp myapp=docker.io/burrsutter/quarkus-demo:v1
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
+Bonjour from Spring Boot! 19
+Bonjour from Spring Boot! 20
+Aloha from Supersonic Subatomic Quarkus! 1
 Aloha from Supersonic Subatomic Quarkus! 2
-Aloha from Supersonic Subatomic Quarkus! 3
-Aloha from Supersonic Subatomic Quarkus! 4
+Bonjour from Spring Boot! 19
 ----
 
 [.console-input]
@@ -603,10 +614,10 @@ kubectl set image deployment/myapp myapp=docker.io/burrsutter/boot-demo:v1
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-Bonjour from Spring Boot! 3
-Bonjour from Spring Boot! 4
-Bonjour from Spring Boot! 1
-Bonjour from Spring Boot! 5
+Jambo from Spring Boot! 1
+Jambo from Spring Boot! 2
+Aloha from Supersonic Subatomic Quarkus! 26
+Jambo from Spring Boot! 3
 ----
 
 
