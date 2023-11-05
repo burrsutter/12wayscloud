@@ -67,10 +67,22 @@ kubectl replace -f bgc-virtual-service-canary.yml
 kubectl replace -f bgc-virtual-service-default.yml
 ----
 
+image::./images/acs-frankfurt-istio.png[]
 
 == Clean
 
-Wipe the GKE cluster
+----
+kubectl delete namespace one
+kubectl delete namespace tutorial
+----
+
+Scale down or wipe the GKE cluster
+----
+istioctl uninstall
+gcloud container clusters resize frankfurt --zone europe-west3-a --node-pool default-pool --num-nodes 2
+----
+
+or
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]

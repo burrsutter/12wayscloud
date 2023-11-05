@@ -3,6 +3,7 @@
 .DS_Store
 bin
 istio-1.16.1
+istio-1.19.3
 kubernetes-tutorial
 kafka-tutorial
 istio-tutorial

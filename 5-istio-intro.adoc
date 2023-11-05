@@ -9,8 +9,29 @@ https://istio.io/latest/docs/setup/getting-started/
 gcloud container clusters list
 
 export KUBECONFIG=/Users/burr/xKS/.kubeconfig/frankfurt-config
+----
 
+
+----
+gcloud components install gke-gcloud-auth-plugin
+export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+source /opt/homebrew/Caskroom/google-cloud-sdk/latest/google-cloud-sdk/path.zsh.inc
+gke-gcloud-auth-plugin --version
+----
+
+
+
+If no cluster exists
+----
 gcloud container clusters create frankfurt --zone europe-west3-a --num-nodes 4
+----
+
+If a cluster exists, scale up worker nodes
+
+https://github.com/burrsutter/xKS-docs/blob/main/gke-readme.adoc
+
+----
+gcloud container clusters resize frankfurt --zone europe-west3-a --node-pool default-pool --num-nodes 4
 ----
 
 ----
@@ -18,12 +39,13 @@ kubectl get nodes
 ----
 
 ----
-NAME                                       STATUS   ROLES    AGE   VERSION
-gke-frankfurt-default-pool-f6e5f40a-2k7k   Ready    <none>   10m   v1.24.8-gke.2000
-gke-frankfurt-default-pool-f6e5f40a-42bw   Ready    <none>   10m   v1.24.8-gke.2000
-gke-frankfurt-default-pool-f6e5f40a-fhw8   Ready    <none>   10m   v1.24.8-gke.2000
-gke-frankfurt-default-pool-f6e5f40a-rkz4   Ready    <none>   10m   v1.24.8-gke.2000
+NAME                                       STATUS   ROLES    AGE     VERSION
+gke-frankfurt-default-pool-d9d54bda-7fj9   Ready    <none>   17s     v1.26.6-gke.1700
+gke-frankfurt-default-pool-d9d54bda-sjam   Ready    <none>   5d22h   v1.26.6-gke.1700
+gke-frankfurt-default-pool-d9d54bda-v1hg   Ready    <none>   5d22h   v1.26.6-gke.1700
+gke-frankfurt-default-pool-d9d54bda-vp7b   Ready    <none>   17s     v1.26.6-gke.1700
 ----
+
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -31,12 +53,12 @@ gke-frankfurt-default-pool-f6e5f40a-rkz4   Ready    <none>   10m   v1.24.8-gke.2
 curl -L https://istio.io/downloadIstio | sh -
 ----
 
-OR
+OR for a specific version
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.16.1 TARGET_ARCH=x86_64 sh -
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.19.3 TARGET_ARCH=x86_64 sh -
 ----
 
 [.console-input]
@@ -48,13 +70,21 @@ export PATH=/Users/burr/devnation/12wayscloud/istio-1.16.1/bin:$PATH
 ----
 istioctl version
 no running Istio pods in "istio-system"
-1.16.1
+1.19.3
 ----
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
 istioctl install --set profile=demo -y
+----
+
+----
+kubectl get pods -n istio-system
+NAME                                    READY   STATUS    RESTARTS   AGE
+istio-egressgateway-7f97d7f6f8-l7pfg    1/1     Running   0          77s
+istio-ingressgateway-5bcbbb68fd-2lcw9   1/1     Running   0          77s
+istiod-6b685c47bf-xz59j                 1/1     Running   0          87s
 ----
 
 [.console-input]
@@ -64,21 +94,21 @@ kubectl get crds | grep istio
 ----
 
 ----
-authorizationpolicies.security.istio.io          2023-01-29T20:40:38Z
-destinationrules.networking.istio.io             2023-01-29T20:40:38Z
-envoyfilters.networking.istio.io                 2023-01-29T20:40:39Z
-gateways.networking.istio.io                     2023-01-29T20:40:39Z
-istiooperators.install.istio.io                  2023-01-29T20:40:39Z
-peerauthentications.security.istio.io            2023-01-29T20:40:39Z
-proxyconfigs.networking.istio.io                 2023-01-29T20:40:39Z
-requestauthentications.security.istio.io         2023-01-29T20:40:39Z
-serviceentries.networking.istio.io               2023-01-29T20:40:40Z
-sidecars.networking.istio.io                     2023-01-29T20:40:40Z
-telemetries.telemetry.istio.io                   2023-01-29T20:40:40Z
-virtualservices.networking.istio.io              2023-01-29T20:40:40Z
-wasmplugins.extensions.istio.io                  2023-01-29T20:40:41Z
-workloadentries.networking.istio.io              2023-01-29T20:40:41Z
-workloadgroups.networking.istio.io               2023-01-29T20:40:41Z
+authorizationpolicies.security.istio.io          2023-11-05T20:18:19Z
+destinationrules.networking.istio.io             2023-11-05T20:18:20Z
+envoyfilters.networking.istio.io                 2023-11-05T20:18:20Z
+gateways.networking.istio.io                     2023-11-05T20:18:20Z
+istiooperators.install.istio.io                  2023-11-05T20:18:20Z
+peerauthentications.security.istio.io            2023-11-05T20:18:20Z
+proxyconfigs.networking.istio.io                 2023-11-05T20:18:20Z
+requestauthentications.security.istio.io         2023-11-05T20:18:21Z
+serviceentries.networking.istio.io               2023-11-05T20:18:21Z
+sidecars.networking.istio.io                     2023-11-05T20:18:21Z
+telemetries.telemetry.istio.io                   2023-11-05T20:18:21Z
+virtualservices.networking.istio.io              2023-11-05T20:18:21Z
+wasmplugins.extensions.istio.io                  2023-11-05T20:18:21Z
+workloadentries.networking.istio.io              2023-11-05T20:18:22Z
+workloadgroups.networking.istio.io               2023-11-05T20:18:22Z
 ----
 
 [.console-input]
@@ -133,7 +163,7 @@ kubectl create -f istio-tutorial/customer/kubernetes/Gateway.yml -n tutorial
 ----
 
 ----
-kubectl get vs
+kubectl get virtualservice
 NAME               GATEWAYS               HOSTS   AGE
 customer-gateway   ["customer-gateway"]   ["*"]   4s
 ----
@@ -223,7 +253,12 @@ Switch to v1
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl edit vs recommendation
+kubectl edit virtualservice recommendation
+----
+
+Delete virtualservice for both v1 and v2
+----
+kubectl delete virtualservice recommendation
 ----
 
 == Kiali
@@ -233,8 +268,18 @@ https://istio.io/latest/docs/ops/integrations/kiali/#installation
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl apply -f istio-1.16.1/samples/addons/prometheus.yaml
-kubectl apply -f istio-1.16.1/samples/addons/kiali.yaml
+kubectl apply -f istio-1.19.3/samples/addons/prometheus.yaml
+kubectl apply -f istio-1.19.3/samples/addons/kiali.yaml
+----
+
+----
+kubectl get pods -n istio-system
+NAME                                    READY   STATUS    RESTARTS   AGE
+istio-egressgateway-7f97d7f6f8-l7pfg    1/1     Running   0          12m
+istio-ingressgateway-5bcbbb68fd-2lcw9   1/1     Running   0          12m
+istiod-6b685c47bf-xz59j                 1/1     Running   0          12m
+kiali-6d559fdf7d-nzr6c                  1/1     Running   0          37s
+prometheus-67f6764db9-wfg95             2/2     Running   0          40s
 ----
 
 ----
@@ -253,6 +298,7 @@ kubectl edit service kiali -n istio-system
 
 image::./images/kiali-loadbalancer.png[]
 
+Looking for that external-ip
 
 ----
 kubectl get services kiali -n istio-system
@@ -293,3 +339,17 @@ customer => preference => recommendation v1 from 'recommendation-v1-64f475959-jj
 
 
 image::./images/kiali-dashboard-error.png[]
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+curl localhost:8080/behave
+----
+
+----
+customer => preference => recommendation v2 from 'recommendation-v2-5ff5598db-srzcv': 584
+customer => preference => recommendation v1 from 'recommendation-v1-bcf54f676-5689t': 1155
+customer => preference => recommendation v2 from 'recommendation-v2-5ff5598db-srzcv': 585
+customer => preference => recommendation v2 from 'recommendation-v2-5ff5598db-srzcv': 586
+----
+
