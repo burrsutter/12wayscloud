@@ -13,6 +13,8 @@ https://knative.dev/docs/getting-started/quickstart-install/#before-you-begin
 https://redhat-developer-demos.github.io/knative-tutorial/knative-tutorial/setup/setup.html
 
 
+We will be using the Knative Quickstart that creates its own KinD cluster
+
 ----
 brew install knative/client/kn
 ----
@@ -22,15 +24,15 @@ kn version
 ----
 
 ----
-Version:      v1.8.1
-Build Date:   2022-10-20 16:09:37
-Git Revision: 1db36698
+Version:      v1.12.0
+Build Date:   2023-10-25 15:45:39
+Git Revision: ae357368
 Supported APIs:
 * Serving
-  - serving.knative.dev/v1 (knative-serving v1.8.0)
+  - serving.knative.dev/v1 (knative-serving v1.12.0)
 * Eventing
-  - sources.knative.dev/v1 (knative-eventing v1.8.0)
-  - eventing.knative.dev/v1 (knative-eventing v1.8.0)
+  - sources.knative.dev/v1 (knative-eventing v1.12.0)
+  - eventing.knative.dev/v1 (knative-eventing v1.12.0)
 ----
 
 ----
@@ -47,7 +49,7 @@ export KUBE_EDITOR="code -w"
 This next command starts a KinD cluster specifically for Knative usage
 
 ----
-kn quickstart kind
+kn-quickstart kind
 ----
 
 image::./images/knative-kind.png[]
@@ -77,30 +79,28 @@ kubectl get pods -A
 
 ----
 NAMESPACE            NAME                                            READY   STATUS    RESTARTS   AGE
-knative-eventing     eventing-controller-7f448655c8-pgpnf            1/1     Running   0          11m
-knative-eventing     eventing-webhook-7d5b577c94-ddrq4               1/1     Running   0          11m
-knative-eventing     imc-controller-769d8b7f66-xh7dn                 1/1     Running   0          10m
-knative-eventing     imc-dispatcher-55979cf74b-dcrwc                 1/1     Running   0          10m
-knative-eventing     mt-broker-controller-66b756f8bb-fdlvv           1/1     Running   0          10m
-knative-eventing     mt-broker-filter-56b5d6d697-79dwz               1/1     Running   0          10m
-knative-eventing     mt-broker-ingress-5c4d45dfd6-45vzg              1/1     Running   0          10m
-knative-serving      activator-5f6b4bf5c8-qn7zr                      1/1     Running   0          11m
-knative-serving      autoscaler-bc7d6c9c9-gg7hn                      1/1     Running   0          11m
-knative-serving      controller-687d88ff56-rlwsd                     1/1     Running   0          11m
-knative-serving      domain-mapping-69cc86d8d5-6jxmv                 1/1     Running   0          11m
-knative-serving      domainmapping-webhook-65dfdd9b96-rmtr4          1/1     Running   0          11m
-knative-serving      net-kourier-controller-55c99987b4-5jvwz         1/1     Running   0          11m
-knative-serving      webhook-587cdd8dd7-pp7wc                        1/1     Running   0          11m
-kourier-system       3scale-kourier-gateway-7b89ff5c79-jmzk8         1/1     Running   0          11m
-kube-system          coredns-6d4b75cb6d-7trw9                        1/1     Running   0          12m
-kube-system          coredns-6d4b75cb6d-q42nd                        1/1     Running   0          12m
-kube-system          etcd-knative-control-plane                      1/1     Running   0          12m
-kube-system          kindnet-5nqfr                                   1/1     Running   0          12m
-kube-system          kube-apiserver-knative-control-plane            1/1     Running   0          12m
-kube-system          kube-controller-manager-knative-control-plane   1/1     Running   0          12m
-kube-system          kube-proxy-64bnj                                1/1     Running   0          12m
-kube-system          kube-scheduler-knative-control-plane            1/1     Running   0          12m
-local-path-storage   local-path-provisioner-6b84c5c67f-mv7xl         1/1     Running   0          12m
+knative-eventing     eventing-controller-79547fd7f4-ddd72            1/1     Running   0          7m35s
+knative-eventing     eventing-webhook-8458d5898c-9vk6w               1/1     Running   0          7m35s
+knative-eventing     imc-controller-6d55d956f-pdspl                  1/1     Running   0          7m4s
+knative-eventing     imc-dispatcher-895bfd847-nvxtz                  1/1     Running   0          7m4s
+knative-eventing     mt-broker-controller-6754559b7c-82jpq           1/1     Running   0          6m56s
+knative-eventing     mt-broker-filter-7475984f8-m7vbj                1/1     Running   0          6m56s
+knative-eventing     mt-broker-ingress-6786db9bfd-l8gwr              1/1     Running   0          6m56s
+knative-serving      activator-8c964665f-6fpdm                       1/1     Running   0          8m5s
+knative-serving      autoscaler-5fc869cc5-d6qmc                      1/1     Running   0          8m5s
+knative-serving      controller-5946d56bc-s7th5                      1/1     Running   0          8m5s
+knative-serving      net-kourier-controller-d46684575-knhr9          1/1     Running   0          7m56s
+knative-serving      webhook-75d84c68b9-798ws                        1/1     Running   0          8m5s
+kourier-system       3scale-kourier-gateway-6f84654dc4-wrhrn         1/1     Running   0          7m56s
+kube-system          coredns-787d4945fb-7bgnn                        1/1     Running   0          8m12s
+kube-system          coredns-787d4945fb-nr7xq                        1/1     Running   0          8m12s
+kube-system          etcd-knative-control-plane                      1/1     Running   0          8m29s
+kube-system          kindnet-wpqhf                                   1/1     Running   0          8m12s
+kube-system          kube-apiserver-knative-control-plane            1/1     Running   0          8m27s
+kube-system          kube-controller-manager-knative-control-plane   1/1     Running   0          8m29s
+kube-system          kube-proxy-7gfkz                                1/1     Running   0          8m12s
+kube-system          kube-scheduler-knative-control-plane            1/1     Running   0          8m27s
+local-path-storage   local-path-provisioner-6bd6454576-hbcdf         1/1     Running   0          8m12s
 ----
 
 ----
@@ -109,30 +109,31 @@ kubectl get crds
 
 ----
 NAME                                                  CREATED AT
-apiserversources.sources.knative.dev                  2023-01-28T14:19:49Z
-brokers.eventing.knative.dev                          2023-01-28T14:19:49Z
-certificates.networking.internal.knative.dev          2023-01-28T14:19:15Z
-channels.messaging.knative.dev                        2023-01-28T14:19:49Z
-clusterdomainclaims.networking.internal.knative.dev   2023-01-28T14:19:15Z
-configurations.serving.knative.dev                    2023-01-28T14:19:15Z
-containersources.sources.knative.dev                  2023-01-28T14:19:49Z
-domainmappings.serving.knative.dev                    2023-01-28T14:19:15Z
-eventtypes.eventing.knative.dev                       2023-01-28T14:19:49Z
-images.caching.internal.knative.dev                   2023-01-28T14:19:16Z
-ingresses.networking.internal.knative.dev             2023-01-28T14:19:15Z
-inmemorychannels.messaging.knative.dev                2023-01-28T14:20:24Z
-metrics.autoscaling.internal.knative.dev              2023-01-28T14:19:15Z
-parallels.flows.knative.dev                           2023-01-28T14:19:49Z
-pingsources.sources.knative.dev                       2023-01-28T14:19:49Z
-podautoscalers.autoscaling.internal.knative.dev       2023-01-28T14:19:15Z
-revisions.serving.knative.dev                         2023-01-28T14:19:16Z
-routes.serving.knative.dev                            2023-01-28T14:19:16Z
-sequences.flows.knative.dev                           2023-01-28T14:19:49Z
-serverlessservices.networking.internal.knative.dev    2023-01-28T14:19:16Z
-services.serving.knative.dev                          2023-01-28T14:19:16Z
-sinkbindings.sources.knative.dev                      2023-01-28T14:19:49Z
-subscriptions.messaging.knative.dev                   2023-01-28T14:19:49Z
-triggers.eventing.knative.dev                         2023-01-28T14:19:49Z
+NAME                                                  CREATED AT
+apiserversources.sources.knative.dev                  2023-11-05T21:07:57Z
+brokers.eventing.knative.dev                          2023-11-05T21:07:57Z
+certificates.networking.internal.knative.dev          2023-11-05T21:07:28Z
+channels.messaging.knative.dev                        2023-11-05T21:07:57Z
+clusterdomainclaims.networking.internal.knative.dev   2023-11-05T21:07:28Z
+configurations.serving.knative.dev                    2023-11-05T21:07:28Z
+containersources.sources.knative.dev                  2023-11-05T21:07:57Z
+domainmappings.serving.knative.dev                    2023-11-05T21:07:28Z
+eventtypes.eventing.knative.dev                       2023-11-05T21:07:57Z
+images.caching.internal.knative.dev                   2023-11-05T21:07:28Z
+ingresses.networking.internal.knative.dev             2023-11-05T21:07:28Z
+inmemorychannels.messaging.knative.dev                2023-11-05T21:08:32Z
+metrics.autoscaling.internal.knative.dev              2023-11-05T21:07:28Z
+parallels.flows.knative.dev                           2023-11-05T21:07:57Z
+pingsources.sources.knative.dev                       2023-11-05T21:07:57Z
+podautoscalers.autoscaling.internal.knative.dev       2023-11-05T21:07:28Z
+revisions.serving.knative.dev                         2023-11-05T21:07:28Z
+routes.serving.knative.dev                            2023-11-05T21:07:28Z
+sequences.flows.knative.dev                           2023-11-05T21:07:57Z
+serverlessservices.networking.internal.knative.dev    2023-11-05T21:07:28Z
+services.serving.knative.dev                          2023-11-05T21:07:28Z
+sinkbindings.sources.knative.dev                      2023-11-05T21:07:57Z
+subscriptions.messaging.knative.dev                   2023-11-05T21:07:57Z
+triggers.eventing.knative.dev                         2023-11-05T21:07:57Z
 ----
 
 ----
@@ -144,7 +145,7 @@ metrics                                           autoscaling.internal.knative.d
 podautoscalers                    kpa,pa          autoscaling.internal.knative.dev/v1alpha1   true         PodAutoscaler
 images                                            caching.internal.knative.dev/v1alpha1       true         Image
 brokers                                           eventing.knative.dev/v1                     true         Broker
-eventtypes                                        eventing.knative.dev/v1beta1                true         EventType
+eventtypes                                        eventing.knative.dev/v1beta2                true         EventType
 triggers                                          eventing.knative.dev/v1                     true         Trigger
 parallels                                         flows.knative.dev/v1                        true         Parallel
 sequences                                         flows.knative.dev/v1                        true         Sequence
@@ -188,6 +189,10 @@ Creating service 'hello' in namespace 'default':
 
 Service 'hello' created to latest revision 'hello-00001' is available at URL:
 http://hello.default.127.0.0.1.sslip.io
+----
+
+----
+watch kubectl get pods
 ----
 
 ----
@@ -254,9 +259,8 @@ kn service list
 ----
 
 ----
-kn service list
-NAME    URL                                       LATEST        AGE    CONDITIONS   READY   REASON
-hello   http://hello.default.127.0.0.1.sslip.io   hello-00001   115m   3 OK / 3     True
+NAME    URL                                       LATEST        AGE     CONDITIONS   READY   REASON
+hello   http://hello.default.127.0.0.1.sslip.io   hello-00001   3m10s   3 OK / 3     True
 ----
 
 ----
@@ -297,6 +301,13 @@ kn service delete hello
 
 == Side By Side
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl create namespace sidebyside
+kubectl config set-context --current --namespace=sidebyside
+----
+
 ----
 kn service create pythoned \
   --image=docker.io/burrsutter/pythoned:1.0.0
@@ -322,9 +333,47 @@ kn service create quarked \
 
 ----
 curl $(kn service describe quarked -o url)
+curl $(kn service describe noded -o url)
+curl $(kn service describe pythoned -o url)
+----
+
+----
+kubectl get kservice
+NAME       URL                                             LATESTCREATED    LATESTREADY      READY   REASON
+noded      http://noded.sidebyside.127.0.0.1.sslip.io      noded-00001      noded-00001      True
+pythoned   http://pythoned.sidebyside.127.0.0.1.sslip.io   pythoned-00001   pythoned-00001   True
+quarked    http://quarked.sidebyside.127.0.0.1.sslip.io    quarked-00001    quarked-00001    True
+----
+
+----
+watch kubectl get deployments
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+noded-00001-deployment      0/0     0            0           3m52s
+pythoned-00001-deployment   0/0     0            0           3m58s
+quarked-00001-deployment    0/0     0            0           3m46s
+----
+
+----
+curl $(kn service describe quarked -o url)
+curl $(kn service describe noded -o url)
+curl $(kn service describe pythoned -o url)
+----
+
+
+Clean up sidebyside
+----
+kubectl delete namespace sidebyside
 ----
 
 == Traffic Spliting
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl create namespace splitting
+kubectl config set-context --current --namespace=splitting
+----
+
 
 ----
 git clone https://github.com/redhat-developer-demos/knative-tutorial
@@ -359,7 +408,7 @@ kubectl apply -f $KNATIVE_TUTORIAL_HOME/serving/colors-service-green.yaml
 ----
 
 ----
-kn revision list
+watch kn revision list
 ----
 
 ----
@@ -370,9 +419,7 @@ blue-green-canary-00001   blue-green-canary                    1            7m31
 
 image::./images/green.png[]
 
-Flip
-
-Blue
+Flip to Blue
 
 ----
 kn service update blue-green-canary \
@@ -416,11 +463,12 @@ blue-green-canary-00001   blue-green-canary   45%              1            18m 
 ----
 
 Clean
+
 ----
  kn service delete blue-green-canary
 ----
 
-== Functions - func
+== Functions with func
 
 https://knative.dev/docs/functions/
 
@@ -436,8 +484,8 @@ brew install func
 ----
 
 ----
-func --version
-v1.9.0
+func version
+v0.38.0-99-gcd0bc6ae
 ----
 
 ----

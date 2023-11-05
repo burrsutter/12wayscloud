@@ -12,7 +12,7 @@ Just re-creating the cluster for a cleaner place to play
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-kn quickstart kind
+kn-quickstart kind --registry
 ----
 
 Sources to Sinks
@@ -80,6 +80,10 @@ kn source ping create eventinghello-ping-source \
   --sink ksvc:eventinghello
 ----
 
+----
+kn source list
+----
+
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
@@ -113,7 +117,66 @@ kn service delete eventinghello
 
 == Kafka & Knative
 
-Follow the steps in 4-kafka.adoc to configure a Kafka inside your KinD cluster
+Let's get a Kafka running
+
+https://strimzi.io/quickstarts/
+
+----
+kubectl create namespace kafka
+kubectl config set-context --current --namespace=kafka
+----
+
+Install Strimzi Operator
+
+----
+kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
+----
+
+----
+kubectl get crds | grep kafka
+----
+
+----
+kubectl get crds | grep kafka
+kafkabridges.kafka.strimzi.io         2023-11-05T18:54:15Z
+kafkaconnectors.kafka.strimzi.io      2023-11-05T18:54:15Z
+kafkaconnects.kafka.strimzi.io        2023-11-05T18:54:14Z
+kafkamirrormaker2s.kafka.strimzi.io   2023-11-05T18:54:14Z
+kafkamirrormakers.kafka.strimzi.io    2023-11-05T18:54:15Z
+kafkanodepools.kafka.strimzi.io       2023-11-05T18:54:15Z
+kafkarebalances.kafka.strimzi.io      2023-11-05T18:54:15Z
+kafkas.kafka.strimzi.io               2023-11-05T18:54:15Z
+kafkatopics.kafka.strimzi.io          2023-11-05T18:54:14Z
+kafkausers.kafka.strimzi.io           2023-11-05T18:54:15Z
+----
+
+----
+kubectl get pods
+NAME                                        READY   STATUS    RESTARTS   AGE
+strimzi-cluster-operator-848bbcd8b5-sv82h   1/1     Running   0          72s
+----
+
+Create a Kafka Broker
+
+----
+kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-persistent-single.yaml -n kafka
+----
+
+----
+kubectl get pods
+NAME                                          READY   STATUS    RESTARTS   AGE
+my-cluster-entity-operator-5db6bc4679-jsh2n   3/3     Running   0          89s
+my-cluster-kafka-0                            1/1     Running   0          116s
+my-cluster-zookeeper-0                        1/1     Running   0          2m34s
+strimzi-cluster-operator-848bbcd8b5-sv82h     1/1     Running   0          7m34s
+----
+
+----
+kubectl get kafkas
+NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS   READY   WARNINGS
+my-cluster   1                        1                     True
+----
+
 
 More information at 
 
@@ -135,9 +198,9 @@ NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS   READY   WARNINGS
 my-cluster   1                        1                     True
 ----
 
-[.console-input]
-[source,bash,subs="+macros,+attributes"]
 ----
+kubectl get kafkatopic
+# if my-topic exists, delete it
 kubectl delete kafkatopic my-topic
 ----
 
@@ -190,13 +253,13 @@ https://knative.dev/docs/eventing/sources/kafka-source/
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl apply -f https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.8.6/eventing-kafka-controller.yaml
+kubectl apply -f https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.12.0/eventing-kafka-controller.yaml
 ----
 
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-kubectl apply -f https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.8.6/eventing-kafka-source.yaml
+kubectl apply -f https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.12.0/eventing-kafka-source.yaml
 ----
 
 [.console-output]
@@ -247,7 +310,7 @@ kubectl get crds | grep kafkasource
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-kafkasources.sources.knative.dev                      2023-01-29T00:14:00Z
+kafkasources.sources.knative.dev                      2023-11-05T22:06:39Z
 ----
 
 
@@ -273,7 +336,7 @@ spec:
             memory: "50Mi"
             cpu: "100m"
           limits:
-            memory: "70Mi"
+            memory: "80Mi"
             cpu: "100m"
         livenessProbe:
           httpGet:
@@ -337,3 +400,8 @@ curl localhost:8080/10
 
 
 image::./images/kafka-source-knative.gif[]
+
+Clean up KinD
+----
+kind delete cluster --name knative
+----

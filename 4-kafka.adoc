@@ -37,7 +37,7 @@ kubectl config set-context --current --namespace=kafka
 Install Strimzi Operator
 
 ----
-kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
+  kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 ----
 
 ----
@@ -67,7 +67,13 @@ strimzi-cluster-operator-848bbcd8b5-sv82h   1/1     Running   0          72s
 Create a Kafka Broker
 
 ----
-kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-persistent-single.yaml -n kafka 
+kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-persistent-single.yaml -n kafka
+----
+
+----
+kubectl get kafkas
+NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS   READY   WARNINGS
+my-cluster   1                        1                     True
 ----
 
 ----
@@ -91,11 +97,6 @@ kubectl -n kafka run kafka-producer -ti --image=quay.io/strimzi/kafka:0.33.0-kaf
 
 image::./images/kafka-1.png[]
 
-----
-kubectl get kafkas
-NAME         DESIRED KAFKA REPLICAS   DESIRED ZK REPLICAS   READY   WARNINGS
-my-cluster   1                        1                     True
-----
 
 ----
 kubectl get kafkatopics
