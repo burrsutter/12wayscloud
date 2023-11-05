@@ -603,6 +603,7 @@ kubectl config set-context --current --namespace=mygreetings
 ----
 
 Update the ClusterRoleBinding in greeting-operator.yml
+
 ----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -619,6 +620,7 @@ subjects:
 ----
 
 And
+
 ----
 apiVersion: v1
 kind: ServiceAccount
@@ -634,6 +636,7 @@ metadata:
 ----
 
 And
+
 ----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
@@ -651,6 +654,7 @@ subjects:
 
 
 And update the ClusterRole entry
+
 ----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -682,6 +686,7 @@ rules:
 ----
 
 and Deploy the Controller
+
 ----
 kubectl apply -f greeting-operator-yamls/greeting-operator.yml
 ----
@@ -715,8 +720,9 @@ greeting-operator-6cc8c477dd-w8qlc   1/1     Running   0          19s
 ----
 
 and the output from Stern
+
 ----
-, kubernetes-client, micrometer, openshift-client, operator-sdk, smallrye-context-propagation, smallrye-health, vertx]
+kubernetes-client, micrometer, openshift-client, operator-sdk, smallrye-context-propagation, smallrye-health, vertx]
 greeting-operator-6cc8c477dd-w8qlc greeting-operator You want a Greeting pod with hello: aloha
 ----
 
