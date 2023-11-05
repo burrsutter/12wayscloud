@@ -1,5 +1,32 @@
 = Way 4: Kafka
 
+Create KinD Cluster
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kind create cluster --name 12ways --config=-
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+EOF
+----
+
+
 https://strimzi.io/quickstarts/
 
 ----
@@ -19,15 +46,16 @@ kubectl get crds | grep kafka
 
 ----
 kubectl get crds | grep kafka
-kafkabridges.kafka.strimzi.io                         2023-01-28T23:46:06Z
-kafkaconnectors.kafka.strimzi.io                      2023-01-28T23:46:06Z
-kafkaconnects.kafka.strimzi.io                        2023-01-28T23:46:06Z
-kafkamirrormaker2s.kafka.strimzi.io                   2023-01-28T23:46:06Z
-kafkamirrormakers.kafka.strimzi.io                    2023-01-28T23:46:06Z
-kafkarebalances.kafka.strimzi.io                      2023-01-28T23:46:06Z
-kafkas.kafka.strimzi.io                               2023-01-28T23:46:06Z
-kafkatopics.kafka.strimzi.io                          2023-01-28T23:46:06Z
-kafkausers.kafka.strimzi.io                           2023-01-28T23:46:06Z
+kafkabridges.kafka.strimzi.io         2023-11-05T18:54:15Z
+kafkaconnectors.kafka.strimzi.io      2023-11-05T18:54:15Z
+kafkaconnects.kafka.strimzi.io        2023-11-05T18:54:14Z
+kafkamirrormaker2s.kafka.strimzi.io   2023-11-05T18:54:14Z
+kafkamirrormakers.kafka.strimzi.io    2023-11-05T18:54:15Z
+kafkanodepools.kafka.strimzi.io       2023-11-05T18:54:15Z
+kafkarebalances.kafka.strimzi.io      2023-11-05T18:54:15Z
+kafkas.kafka.strimzi.io               2023-11-05T18:54:15Z
+kafkatopics.kafka.strimzi.io          2023-11-05T18:54:14Z
+kafkausers.kafka.strimzi.io           2023-11-05T18:54:15Z
 ----
 
 ----
@@ -76,6 +104,12 @@ consumer-offsets---84e7a678d08f4bd226872e5cdd4eb527fadc1c6a                     
 my-topic                                                                                           my-cluster   1            1                    True
 strimzi-store-topic---effb8e3e057afce1ecf67c3f5d8e4e3ff177fc55                                     my-cluster   1            1                    True
 strimzi-topic-operator-kstreams-topic-store-changelog---b75e702040b99be8a9263134de3507fc0cc4017b   my-cluster   1            1
+----
+
+----
+kubectl delete kafka my-cluster
+NAME                                       READY   STATUS    RESTARTS   AGE
+strimzi-cluster-operator-95d88f6b5-rjh5x   1/1     Running   0          8m14s
 ----
 
 Clean up KinD

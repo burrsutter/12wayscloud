@@ -1,4 +1,4 @@
-
+= Way 3: Extending Kubernetes
 
 https://javaoperatorsdk.io/docs/getting-started
 
