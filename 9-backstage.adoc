@@ -4,7 +4,7 @@
 [source,bash,subs="+macros,+attributes"]
 ----
 helm version
-version.BuildInfo{Version:"v3.11.0", GitCommit:"472c5736ab01133de504a826bd9ee12cbe4e7904", GitTreeState:"clean", GoVersion:"go1.19.5"}
+version.BuildInfo{Version:"v3.13.1", GitCommit:"3547a4b5bf5edb5478ce352e18858d8a552a4110", GitTreeState:"clean", GoVersion:"go1.21.3"}
 ----
 
 == Backstage on localhost
@@ -26,22 +26,28 @@ nvm use 18
 
 ----
 node -v 
-v18.13.0
+v18.18.2
 ----
 
 ----
 npm -v
-8.19.3
+9.8.1
 ----
 
 ----
 npx @backstage/create-app@latest
 ----
 
+my-backstage-app
+
 ----
 brew install yarn
+yarn version
+yarn version v1.22.19
+----
 
-cd backstage
+----
+cd my-backstage-app
 
 yarn add --cwd packages/backend pg
 ----
@@ -69,6 +75,8 @@ docker run -it -p 7007:7007 backstage
 
 == Backstage into Kubernetes
 
+https://github.com/backstage/charts/tree/main/charts/backstage
+
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
@@ -79,9 +87,51 @@ helm repo add backstage https://backstage.github.io/charts
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
+export KIND_HOME=~/devnation/12wayscloud;
+export PATH=$KIND_HOME/bin:$PATH
+export KUBECONFIG=$KIND_HOME/.kube/config
+export KUBE_EDITOR="code -w"
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kind create cluster --name 12ways --config=-
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl create namespace backstage
+kubectl config set-context --current --namespace=backstage
+----
+
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
 mkdir backstage-helm-install
 cd backstage-helm-install
 ----
+
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -101,6 +151,15 @@ ingress:
   host: localhost
 EOF
 ----
+
+----
+helm install my-release backstage/backstage
+----
+
+----
+kubectl port-forward -n backstage svc/my-release-backstage 7007:7007
+----
+
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -147,7 +206,7 @@ EOF
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
-helm upgrade -n backstage backstage backstage/backstage -f values-ingress-default.yaml
+helm upgrade -n backstage my-release backstage/backstage -f values-ingress-default.yaml
 ----
 
 [.console-input]
@@ -180,3 +239,23 @@ image::./images/backstage-6.png[]
 
 https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/components/petstore-component.yaml
 
+== Clean Up
+
+Clean up KinD
+----
+kind delete cluster --name 12ways
+----
+
+Really clean
+
+----
+rm -rf .kube
+----
+
+Clean up Docker
+
+If you wish to more fully scrub all things from your Docker Daemon to get back to a fresh start
+----
+docker rm `docker ps -a -q`
+docker rmi `docker images -a -q`
+----

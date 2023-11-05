@@ -8,7 +8,9 @@ kubernetes-tutorial
 kafka-tutorial
 istio-tutorial
 knative-tutorial
+my-backstage-app
 backstage
+backstage-helm-install
 tekton-tutorial
 argocd-tutorial
 node-hello-func

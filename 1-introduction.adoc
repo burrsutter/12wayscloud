@@ -303,15 +303,20 @@ In another window, create a Namespace and a Deployment
 ----
 kubectl create namespace mystuff
 kubectl config set-context --current --namespace=mystuff
+----
 
+Deploy something
+
+----
 kubectl create deployment myapp --image=docker.io/burrsutter/quarkus-demo:v1
 ----
 
-watch kubectl get events output
+watch events
 
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
+watch kubectl get events 
 LAST SEEN   TYPE     REASON              OBJECT                        MESSAGE
 9s          Normal   Scheduled           pod/myapp-85cf5bbddb-j8z4t    Successfully assigned mystuff/myapp-85cf5bbddb-j8z4t to 12ways-control
 -plane
