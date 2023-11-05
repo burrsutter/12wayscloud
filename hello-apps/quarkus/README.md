@@ -34,7 +34,7 @@ mvn clean compile package
 
 # Build container image
 ```
-export IMAGE_VER=quarkus-demo:v1
+export IMAGE_VER=quarkus-demo:v2
 
 docker build -f src/main/docker/Dockerfile.jvm -t burrsutter/$IMAGE_VER .
 

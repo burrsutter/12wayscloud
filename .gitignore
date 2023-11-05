@@ -12,3 +12,5 @@ tekton-tutorial
 argocd-tutorial
 node-hello-func
 blue-green-canary
+x86_64
+greeting-operator

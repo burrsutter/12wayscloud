@@ -1,0 +1,184 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    app.quarkus.io/commit-id: 00e878db997575d5072cb627c5f55a7e191635d1
+    app.quarkus.io/build-timestamp: 2023-11-05 - 17:50:52 +0000
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/version: 0.0.1-SNAPSHOT
+    app.kubernetes.io/name: greeting-operator
+  name: greeting-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/version: 0.0.1-SNAPSHOT
+      app.kubernetes.io/name: greeting-operator
+  template:
+    metadata:
+      annotations:
+        app.quarkus.io/commit-id: 00e878db997575d5072cb627c5f55a7e191635d1
+        app.quarkus.io/build-timestamp: 2023-11-05 - 17:50:52 +0000
+        prometheus.io/scrape: "true"
+        prometheus.io/path: /q/metrics
+        prometheus.io/port: "8080"
+        prometheus.io/scheme: http
+      labels:
+        app.kubernetes.io/version: 0.0.1-SNAPSHOT
+        app.kubernetes.io/name: greeting-operator
+    spec:
+      containers:
+        - env:
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          image: burrsutter/greeting-operator:0.0.1-SNAPSHOT
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/live
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+          name: greeting-operator
+          ports:
+            - containerPort: 8080
+              name: http
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /q/health/ready
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 10
+      serviceAccountName: greeting-operator
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: greeting-role-binding
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: greeting-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: greeting-operator
+    namespace: mygreetings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: greeting-crd-validating-role-binding
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: josdk-crd-validating-cluster-role
+subjects:
+  - kind: ServiceAccount
+    name: greeting-operator
+    namespace: mygreetings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: greeting-cluster-role
+rules:
+  - apiGroups:
+    - ''
+    resources:
+      - pods
+      - greetings
+      - greetings/status
+      - greetings/finalizers
+    verbs:
+      - get
+      - list
+      - watch
+      - patch
+      - update
+      - create
+      - delete
+  - apiGroups:
+    - burrsutter.com
+    resources:
+    - greetings
+    verbs:
+    - list
+    - watch
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: josdk-crd-validating-cluster-role
+rules:
+  - apiGroups:
+      - apiextensions.k8s.io
+    resources:
+      - customresourcedefinitions
+    verbs:
+      - get
+      - list
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  annotations:
+    app.quarkus.io/commit-id: 00e878db997575d5072cb627c5f55a7e191635d1
+    app.quarkus.io/build-timestamp: 2023-11-05 - 17:50:52 +0000
+  labels:
+    app.kubernetes.io/version: 0.0.1-SNAPSHOT
+    app.kubernetes.io/name: greeting-operator
+  name: greeting-operator
+  namespace: mygreetings
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: greeting-operator-view
+roleRef:
+  kind: ClusterRole
+  apiGroup: rbac.authorization.k8s.io
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: greeting-operator
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    app.quarkus.io/commit-id: 00e878db997575d5072cb627c5f55a7e191635d1
+    app.quarkus.io/build-timestamp: 2023-11-05 - 17:50:52 +0000
+    prometheus.io/scrape: "true"
+    prometheus.io/path: /q/metrics
+    prometheus.io/port: "8080"
+    prometheus.io/scheme: http
+  labels:
+    app.kubernetes.io/name: greeting-operator
+    app.kubernetes.io/version: 0.0.1-SNAPSHOT
+  name: greeting-operator
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app.kubernetes.io/name: greeting-operator
+    app.kubernetes.io/version: 0.0.1-SNAPSHOT
+  type: ClusterIP

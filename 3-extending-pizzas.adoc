@@ -16,6 +16,11 @@ kubectl api-resources | grep pizza
 kubectl get crds
 ----
 
+----
+No resources found
+----
+
+
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
 ----
@@ -85,6 +90,13 @@ git clone https://github.com/redhat-scholars/kubernetes-tutorial
 Deploy a Controller
 
 ----
+kubectl apply -f https://raw.githubusercontent.com/redhat-scholars/kubernetes-tutorial/master/apps/pizzas/pizza-deployment.yaml
+----
+
+OR
+
+----
+git clone https://github.com/redhat-scholars/kubernetes-tutorial
 kubectl apply -f kubernetes-tutorial/apps/pizzas/pizza-deployment.yaml
 ----
 
