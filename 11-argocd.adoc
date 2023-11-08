@@ -4,3 +4,35 @@ https://github.com/argoproj/argo-cd/issues/9422
 
 https://github.com/burrsutter/doks-argocd
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+export KIND_HOME=~/devnation/12wayscloud;
+export PATH=$KIND_HOME/bin:$PATH
+export KUBECONFIG=$KIND_HOME/.kube/config
+export KUBE_EDITOR="code -w"
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+cat <<EOF | kind create cluster --name 12ways --config=-
+kind: Cluster
+apiVersion: kind.x-k8s.io/v1alpha4
+nodes:
+- role: control-plane
+  kubeadmConfigPatches:
+  - |
+    kind: InitConfiguration
+    nodeRegistration:
+      kubeletExtraArgs:
+        node-labels: "ingress-ready=true"
+  extraPortMappings:
+  - containerPort: 80
+    hostPort: 80
+    protocol: TCP
+  - containerPort: 443
+    hostPort: 443
+    protocol: TCP
+EOF
+----

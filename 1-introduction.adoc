@@ -1,6 +1,6 @@
 = Way 1: Introduction (Getting Started)
 
-Using KinD which requires Docker, perhaps Podman Desktop
+Using KinD 
 
 https://kind.sigs.k8s.io/docs/user/quick-start/
 
@@ -35,12 +35,6 @@ Kustomize Version: v5.0.4-0.20230601165947-6ce0bf390ce3
 helm version
 version.BuildInfo{Version:"v3.13.1", GitCommit:"3547a4b5bf5edb5478ce352e18858d8a552a4110", GitTreeState:"clean", GoVersion:"go1.21.3"}
 ----
-
-I have historically used `kind` with Docker Desktop but Podman Desktop is now a possibility 
-
-https://podman-desktop.io/
-
-image::./images/podman-desktop-1.png[]
 
 
 [.console-input]

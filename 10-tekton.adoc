@@ -135,17 +135,32 @@ kubectl get crds | grep tekton
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-clustertasks.tekton.dev                    2023-01-29T23:42:34Z
-customruns.tekton.dev                      2023-01-29T23:42:34Z
-pipelineresources.tekton.dev               2023-01-29T23:42:34Z
-pipelineruns.tekton.dev                    2023-01-29T23:42:34Z
-pipelines.tekton.dev                       2023-01-29T23:42:34Z
-resolutionrequests.resolution.tekton.dev   2023-01-29T23:42:34Z
-runs.tekton.dev                            2023-01-29T23:42:34Z
-taskruns.tekton.dev                        2023-01-29T23:42:34Z
-tasks.tekton.dev                           2023-01-29T23:42:34Z
-verificationpolicies.tekton.dev            2023-01-29T23:42:34Z
+clustertasks.tekton.dev                    2023-11-06T22:37:53Z
+customruns.tekton.dev                      2023-11-06T22:37:54Z
+pipelineruns.tekton.dev                    2023-11-06T22:37:54Z
+pipelines.tekton.dev                       2023-11-06T22:37:54Z
+resolutionrequests.resolution.tekton.dev   2023-11-06T22:37:54Z
+stepactions.tekton.dev                     2023-11-06T22:37:54Z
+taskruns.tekton.dev                        2023-11-06T22:37:54Z
+tasks.tekton.dev                           2023-11-06T22:37:54Z
+verificationpolicies.tekton.dev            2023-11-06T22:37:54Z
 ----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+kubectl get pods -n tekton-pipelines
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+NAME                                           READY   STATUS    RESTARTS   AGE
+tekton-events-controller-8497b9db67-sjw2m      1/1     Running   0          4m33s
+tekton-pipelines-controller-669b6cb59c-tfsw8   1/1     Running   0          4m33s
+tekton-pipelines-webhook-7df6c667f5-hmhpw      1/1     Running   0          4m33s
+----
+
 
 Dashboard
 
@@ -202,9 +217,9 @@ tkn version
 [.console-output]
 [source,bash,subs="+macros,+attributes"]
 ----
-Client version: 0.29.0
-Pipeline version: v0.44.0
-Dashboard version: v0.32.0
+Client version: 0.32.2
+Pipeline version: v0.53.0
+Dashboard version: v0.41.0
 ----
 
 https://redhat-scholars.github.io/tekton-tutorial/tekton-tutorial/setup.html
@@ -314,12 +329,11 @@ Hello World
 kubectl delete taskrun hello-task-run
 ----
 
-And the Completed Pod goes away
+And the Completed Pod goes away and the logs goes away
 
 ----
 kubectl logs --selector=tekton.dev/taskRun=hello-task-run   
 ----
-
 
 == Self-Describing Task Runs
 
@@ -367,6 +381,15 @@ tkn taskrun delete goodbye-task-run
 tkn task delete hello
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+tkn task ls
+----
+
+----
+No Tasks found
+----
 
 
 == Pipelines
@@ -425,6 +448,21 @@ spec:
         #!/bin/sh
         echo "Three - 3"
 EOF
+----
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
+----
+tkn task ls
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
+NAME    DESCRIPTION   AGE
+one                   17 seconds ago
+three                 3 seconds ago
+two                   11 seconds ago
 ----
 
 Create a Pipeline to organize these Tasks
@@ -510,8 +548,8 @@ tkn pipelines ls
 ----
 
 ----
-NAME            AGE              LAST RUN            STARTED         DURATION   STATUS
-one-two-three   10 minutes ago   one-two-three-run   4 minutes ago   14s        Succeeded
+NAME            AGE              LAST RUN            STARTED          DURATION   STATUS
+one-two-three   39 seconds ago   one-two-three-run   16 seconds ago   13s        Succeeded
 ----
 
 
