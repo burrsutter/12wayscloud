@@ -29,6 +29,8 @@ EOF
 
 https://strimzi.io/quickstarts/
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl create namespace kafka
 kubectl config set-context --current --namespace=kafka
@@ -36,10 +38,14 @@ kubectl config set-context --current --namespace=kafka
 
 Install Strimzi Operator
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
-  kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
+kubectl create -f 'https://strimzi.io/install/latest?namespace=kafka' -n kafka
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl get crds | grep kafka
 ----
@@ -58,6 +64,7 @@ kafkatopics.kafka.strimzi.io          2023-11-05T18:54:14Z
 kafkausers.kafka.strimzi.io           2023-11-05T18:54:15Z
 ----
 
+
 ----
 kubectl get pods
 NAME                                        READY   STATUS    RESTARTS   AGE
@@ -66,6 +73,8 @@ strimzi-cluster-operator-848bbcd8b5-sv82h   1/1     Running   0          72s
 
 Create a Kafka Broker
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl apply -f https://strimzi.io/examples/latest/kafka/kafka-persistent-single.yaml -n kafka
 ----
@@ -86,11 +95,17 @@ strimzi-cluster-operator-848bbcd8b5-sv82h     1/1     Running   0          7m34s
 ----
 
 Test Consumer
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl -n kafka run kafka-consumer -ti --image=quay.io/strimzi/kafka:0.33.0-kafka-3.3.2 --rm=true --restart=Never -- bin/kafka-console-consumer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic --from-beginning
 ----
 
 Test Producer
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl -n kafka run kafka-producer -ti --image=quay.io/strimzi/kafka:0.33.0-kafka-3.3.2 --rm=true --restart=Never -- bin/kafka-console-producer.sh --bootstrap-server my-cluster-kafka-bootstrap:9092 --topic my-topic
 ----
@@ -114,6 +129,9 @@ strimzi-cluster-operator-95d88f6b5-rjh5x   1/1     Running   0          8m14s
 ----
 
 Clean up KinD
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kind delete cluster --name 12ways
 ----
