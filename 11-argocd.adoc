@@ -6,7 +6,7 @@ ArgoCD Global deployment
 
 https://github.com/burrsutter/doks-argocd
 
-Incomplete KinD tutorial below
+== Hello World Tutorial below
 
 [.console-input]
 [source,bash,subs="+macros,+attributes"]
@@ -59,6 +59,18 @@ argocd admin initial-password -n argocd
 ----
 
 ----
+ARGOCD_PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
+----
+
+----
+open https://localhost:8080
+----
+
+----
+argocd login --insecure --grpc-web localhost:8080 --username admin --password $ARGOCD_PASS
+----
+
+----
 kubectl config get-contexts -o name
 ----
 
@@ -66,6 +78,45 @@ kubectl config get-contexts -o name
 argocd cluster add kind-12ways
 ----
 
+----
+argocd cluster list
+SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
+https://kubernetes.default.svc  in-cluster  1.27     Successful
+----
+
+----
+argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace default
+----
+
+----
+argocd app list
+NAME              CLUSTER                         NAMESPACE  PROJECT  STATUS     HEALTH   SYNCPOLICY  CONDITIONS  REPO                                                 PATH       TARGET
+argocd/guestbook  https://kubernetes.default.svc  default    default  OutOfSync  Missing  <none>      <none>      https://github.com/argoproj/argocd-example-apps.git  guestbook
+----
+
+----
+argocd app get guestbook
+Name:               argocd/guestbook
+Project:            default
+Server:             https://kubernetes.default.svc
+Namespace:          default
+URL:                https://localhost:8080/applications/guestbook
+Repo:               https://github.com/argoproj/argocd-example-apps.git
+Target:
+Path:               guestbook
+SyncWindow:         Sync Allowed
+Sync Policy:        <none>
+Sync Status:        Synced to  (53e28ff)
+Health Status:      Healthy
+
+GROUP  KIND        NAMESPACE  NAME          STATUS  HEALTH   HOOK  MESSAGE
+       Service     default    guestbook-ui  Synced  Healthy        service/guestbook-ui created
+apps   Deployment  default    guestbook-ui  Synced  Healthy        deployment.apps/guestbook-ui created
+----
+
+----
+argocd app sync guestbook
+----
 
 === Overall Tutorial Clean Up
 
