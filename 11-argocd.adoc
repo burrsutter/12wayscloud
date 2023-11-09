@@ -41,61 +41,102 @@ nodes:
 EOF
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl create namespace argocd
 kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl patch svc argocd-server -n argocd -p '{"spec": {"type": "LoadBalancer"}}'
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl port-forward svc/argocd-server -n argocd 8080:443
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd admin initial-password -n argocd
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 ARGOCD_PASS=$(kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d)
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 open https://localhost:8080
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd login --insecure --grpc-web localhost:8080 --username admin --password $ARGOCD_PASS
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kubectl config get-contexts -o name
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd cluster add kind-12ways
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd cluster list
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
 SERVER                          NAME        VERSION  STATUS      MESSAGE  PROJECT
 https://kubernetes.default.svc  in-cluster  1.27     Successful
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd app create guestbook --repo https://github.com/argoproj/argocd-example-apps.git --path guestbook --dest-server https://kubernetes.default.svc --dest-namespace default
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd app list
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
 NAME              CLUSTER                         NAMESPACE  PROJECT  STATUS     HEALTH   SYNCPOLICY  CONDITIONS  REPO                                                 PATH       TARGET
 argocd/guestbook  https://kubernetes.default.svc  default    default  OutOfSync  Missing  <none>      <none>      https://github.com/argoproj/argocd-example-apps.git  guestbook
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd app get guestbook
+----
+
+[.console-output]
+[source,bash,subs="+macros,+attributes"]
+----
 Name:               argocd/guestbook
 Project:            default
 Server:             https://kubernetes.default.svc
@@ -114,6 +155,8 @@ GROUP  KIND        NAMESPACE  NAME          STATUS  HEALTH   HOOK  MESSAGE
 apps   Deployment  default    guestbook-ui  Synced  Healthy        deployment.apps/guestbook-ui created
 ----
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 argocd app sync guestbook
 ----
@@ -121,12 +164,17 @@ argocd app sync guestbook
 === Overall Tutorial Clean Up
 
 Clean up KinD
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 kind delete cluster --name 12ways
 ----
 
 Really clean
 
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 rm -rf .kube
 ----
@@ -134,6 +182,9 @@ rm -rf .kube
 Clean up Docker
 
 If you wish to more fully scrub all things from your Docker Daemon to get back to a fresh start
+
+[.console-input]
+[source,bash,subs="+macros,+attributes"]
 ----
 docker rm `docker ps -a -q`
 docker rmi `docker images -a -q`
