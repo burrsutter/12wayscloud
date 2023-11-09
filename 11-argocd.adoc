@@ -66,3 +66,24 @@ kubectl config get-contexts -o name
 argocd cluster add kind-12ways
 ----
 
+
+=== Overall Tutorial Clean Up
+
+Clean up KinD
+----
+kind delete cluster --name 12ways
+----
+
+Really clean
+
+----
+rm -rf .kube
+----
+
+Clean up Docker
+
+If you wish to more fully scrub all things from your Docker Daemon to get back to a fresh start
+----
+docker rm `docker ps -a -q`
+docker rmi `docker images -a -q`
+----
